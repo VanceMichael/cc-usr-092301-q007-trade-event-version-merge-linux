@@ -1,0 +1,11 @@
+services:
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: app
+      POSTGRES_PASSWORD: app
+      POSTGRES_DB: trade
+  app:
+    build: .
+    ports: ["3000:3000"]
+    depends_on: [postgres]
