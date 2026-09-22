@@ -1,0 +1,13 @@
+{
+  "name": "trade-event-service",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "start": "node src/server.js",
+    "test": "node --test",
+    "build": "node --check src/server.js && node --check src/database.js"
+  },
+  "dependencies": {
+    "express": "4.21.0"
+  }
+}
