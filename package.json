@@ -5,7 +5,7 @@
   "scripts": {
     "start": "node src/server.js",
     "test": "node --test",
-    "build": "node --check src/server.js && node --check src/database.js"
+    "build": "node --check src/server.js && node --check src/database.js && node --check src/migrations.js && node --check src/event-service.js && node --check src/app.js && node --check src/sig.js"
   },
   "dependencies": {
     "express": "4.21.0"
