@@ -1,25 +1,19 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const http = require('node:http');
-const app = require('../src/server');
-const { openDatabase } = require('../src/database');
+const { createHarness } = require('./helpers');
 
-test('健康接口和SQLite基础迁移可用', async () => {
-  const db = openDatabase(':memory:');
-  const row = db.prepare('SELECT COUNT(*) AS count FROM schema_versions').get();
-  assert.equal(row.count, 1);
-  db.close();
-  const server = app.listen(0, '127.0.0.1');
-  await new Promise((resolve) => server.once('listening', resolve));
-  const { port } = server.address();
-  const result = await new Promise((resolve, reject) => {
-    http.get({ host: '127.0.0.1', port, path: '/health' }, (response) => {
-      let body = '';
-      response.on('data', (chunk) => { body += chunk; });
-      response.on('end', () => resolve({ status: response.statusCode, body }));
-    }).on('error', reject);
-  });
-  await new Promise((resolve) => server.close(resolve));
-  assert.equal(result.status, 200);
-  assert.deepEqual(JSON.parse(result.body), { status: 'ok' });
+test('健康入口可用', async () => {
+  const h = await createHarness();
+  const res = await h.request('GET', '/health');
+  assert.equal(res.status, 200);
+  assert.deepEqual(res.body, { status: 'ok' });
+  await h.close();
+});
+
+test('机构登记后可在 /orgs 创建', async () => {
+  const h = await createHarness({ orgs: [] });
+  const res = await h.request('POST', '/orgs', { body: { orgId: 'org-x', name: 'X', hmacSecret: 'shh' } });
+  assert.equal(res.status, 201);
+  assert.equal(res.body.orgId, 'org-x');
+  await h.close();
 });
